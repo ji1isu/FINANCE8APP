@@ -53,6 +53,24 @@
   .warn-banner { background:#7f1d1d22; border:1px solid #b91c1c; border-radius:.5rem; padding:.75rem 1rem; }
   .info-banner { background:#1e3a5f22; border:1px solid #1d4ed8; border-radius:.5rem; padding:.75rem 1rem; }
   .success-banner { background:#064e3b22; border:1px solid #059669; border-radius:.5rem; padding:.75rem 1rem; }
+  /* Feature importance panel */
+  .fi-bar-wrap { display:flex; align-items:center; gap:.5rem; margin-bottom:.45rem; }
+  .fi-label { width:110px; font-size:.68rem; color:#94a3b8; text-align:right; flex-shrink:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .fi-track { flex:1; height:10px; background:#1e293b; border-radius:5px; overflow:hidden; }
+  .fi-fill  { height:100%; border-radius:5px; transition:width .7s cubic-bezier(.4,0,.2,1); }
+  .fi-pct   { width:34px; font-size:.68rem; font-weight:700; color:#cbd5e1; text-align:right; flex-shrink:0; }
+  .fi-tag-rv     { background:linear-gradient(90deg,#0891b2,#06b6d4); }
+  .fi-tag-spread { background:linear-gradient(90deg,#7c3aed,#a78bfa); }
+  .fi-tag-stock  { background:linear-gradient(90deg,#0369a1,#38bdf8); }
+  .fi-tag-other  { background:linear-gradient(90deg,#374151,#6b7280); }
+  .param-row { display:flex; align-items:center; gap:.6rem; margin-bottom:.55rem; }
+  .param-label { width:100px; font-size:.7rem; color:#94a3b8; text-align:right; flex-shrink:0; }
+  .param-track { flex:1; height:14px; background:#1e293b; border-radius:7px; overflow:hidden; }
+  .param-fill  { height:100%; border-radius:7px; transition:width .7s cubic-bezier(.4,0,.2,1); }
+  .param-val   { width:40px; font-size:.72rem; font-weight:700; text-align:right; flex-shrink:0; }
+  .fi-subtab-btn { padding:.2rem .75rem; border-radius:.5rem; font-size:.7rem; font-weight:600; cursor:pointer; transition:all .15s; border:1px solid #334155; color:#64748b; background:transparent; }
+  .fi-subtab-btn.active { background:#1e3a5f; border-color:#3b82f6; color:#93c5fd; }
+  @keyframes barGrow { from{width:0} }
 </style>
 </head>
 <body class="min-h-screen">
@@ -1855,6 +1873,25 @@ const MODEL_INFO = {
   'LightGBM': { label:'LightGBM', pill:'pill-lgbm',    desc:"Gradient-boosted trees on HAR + BAS features. Best on mixed regimes." },
 };
 
+// Per-stock GARCH/HAR parameter data
+const STOCK_PARAMS = {"2":{"lev":0.46,"fat":0.14,"blowup":0.0,"model":"GJR-GARCH(1,1,1)-t","bd":0.1192,"bw":0.2552,"bm":-1.3476,"r2":0.2295},"3":{"lev":0.3,"fat":0.24,"blowup":0.0101,"model":"GARCH(1,1)-t","bd":0.1163,"bw":0.1456,"bm":-1.1662,"r2":0.2386},"5":{"lev":0.36,"fat":0.1,"blowup":0.0101,"model":"GJR-GARCH(1,1,1)-t","bd":0.1414,"bw":0.2031,"bm":-1.2817,"r2":0.2362},"6":{"lev":0.38,"fat":0.26,"blowup":0.0101,"model":"GJR-GARCH(1,1,1)-t","bd":0.1206,"bw":0.3027,"bm":-1.383,"r2":0.2408},"7":{"lev":0.46,"fat":0.22,"blowup":0.0,"model":"GJR-GARCH(1,1,1)-t","bd":0.1349,"bw":0.2241,"bm":-1.3208,"r2":0.2368},"9":{"lev":0.42,"fat":0.2,"blowup":0.0101,"model":"GJR-GARCH(1,1,1)-t","bd":0.1237,"bw":0.2026,"bm":-1.3178,"r2":0.2359},"14":{"lev":0.54,"fat":0.22,"blowup":0.0,"model":"GJR-GARCH(1,1,1)-t","bd":0.1076,"bw":0.2577,"bm":-1.371,"r2":0.234},"15":{"lev":0.44,"fat":0.18,"blowup":0.0,"model":"GJR-GARCH(1,1,1)-t","bd":0.1137,"bw":0.2712,"bm":-1.36,"r2":0.234},"17":{"lev":0.4,"fat":0.14,"blowup":0.0,"model":"GJR-GARCH(1,1,1)-t","bd":0.1185,"bw":0.3022,"bm":-1.4014,"r2":0.2345},"18":{"lev":0.4,"fat":0.1,"blowup":0.0101,"model":"GJR-GARCH(1,1,1)-t","bd":0.1748,"bw":0.1646,"bm":-1.2403,"r2":0.2458},"19":{"lev":0.44,"fat":0.2,"blowup":0.0,"model":"GJR-GARCH(1,1,1)-t","bd":0.1099,"bw":0.1535,"bm":-1.2445,"r2":0.2339},"26":{"lev":0.38,"fat":0.26,"blowup":0.0,"model":"GJR-GARCH(1,1,1)-t","bd":0.1136,"bw":0.2196,"bm":-1.2936,"r2":0.2371},"27":{"lev":0.38,"fat":0.2,"blowup":0.0101,"model":"GJR-GARCH(1,1,1)-t","bd":0.1452,"bw":0.2122,"bm":-1.3457,"r2":0.2377},"29":{"lev":0.4,"fat":0.22,"blowup":0.0,"model":"GJR-GARCH(1,1,1)-t","bd":0.1282,"bw":0.2521,"bm":-1.2532,"r2":0.2484},"31":{"lev":0.54,"fat":0.32,"blowup":0.01,"model":"GJR-GARCH(1,1,1)-t","bd":0.0907,"bw":0.1493,"bm":-1.1005,"r2":0.2356},"32":{"lev":0.34,"fat":0.22,"blowup":0.0,"model":"GJR-GARCH(1,1,1)-t","bd":0.1003,"bw":0.2316,"bm":-1.3033,"r2":0.2335},"33":{"lev":0.46,"fat":0.2,"blowup":0.01,"model":"GJR-GARCH(1,1,1)-t","bd":0.1368,"bw":0.2083,"bm":-1.2584,"r2":0.2396},"37":{"lev":0.3,"fat":0.2,"blowup":0.0102,"model":"GARCH(1,1)-t","bd":0.1727,"bw":0.2635,"bm":-1.3535,"r2":0.2417},"39":{"lev":0.32,"fat":0.18,"blowup":0.0,"model":"GJR-GARCH(1,1,1)-t","bd":0.1412,"bw":0.2501,"bm":-1.3555,"r2":0.2349},"40":{"lev":0.28,"fat":0.28,"blowup":0.0101,"model":"GARCH(1,1)-t","bd":0.1369,"bw":0.2351,"bm":-1.3211,"r2":0.2357},"41":{"lev":0.58,"fat":0.18,"blowup":0.0,"model":"GJR-GARCH(1,1,1)-t","bd":0.0884,"bw":0.2196,"bm":-1.283,"r2":0.2295},"43":{"lev":0.4,"fat":0.24,"blowup":0.0,"model":"GJR-GARCH(1,1,1)-t","bd":0.1639,"bw":0.2791,"bm":-1.29,"r2":0.2507},"44":{"lev":0.38,"fat":0.12,"blowup":0.0,"model":"GJR-GARCH(1,1,1)-t","bd":0.1049,"bw":0.2699,"bm":-1.3953,"r2":0.2338},"46":{"lev":0.46,"fat":0.26,"blowup":0.0,"model":"GJR-GARCH(1,1,1)-t","bd":0.095,"bw":0.1363,"bm":-1.2206,"r2":0.2274},"47":{"lev":0.4,"fat":0.22,"blowup":0.0,"model":"GJR-GARCH(1,1,1)-t","bd":0.0882,"bw":0.1772,"bm":-1.2547,"r2":0.2358},"48":{"lev":0.38,"fat":0.2,"blowup":0.0,"model":"GJR-GARCH(1,1,1)-t","bd":0.0971,"bw":0.1579,"bm":-1.2349,"r2":0.2303},"50":{"lev":0.52,"fat":0.22,"blowup":0.0,"model":"GJR-GARCH(1,1,1)-t","bd":0.1421,"bw":0.3042,"bm":-1.4008,"r2":0.2397},"56":{"lev":0.36,"fat":0.18,"blowup":0.0,"model":"GJR-GARCH(1,1,1)-t","bd":0.1171,"bw":0.2606,"bm":-1.3617,"r2":0.2399},"59":{"lev":0.3,"fat":0.2,"blowup":0.0,"model":"GARCH(1,1)-t","bd":0.1072,"bw":0.2181,"bm":-1.304,"r2":0.2335},"62":{"lev":0.38,"fat":0.2,"blowup":0.01,"model":"GJR-GARCH(1,1,1)-t","bd":0.1303,"bw":0.2091,"bm":-1.2914,"r2":0.2286},"64":{"lev":0.4,"fat":0.2,"blowup":0.0,"model":"GJR-GARCH(1,1,1)-t","bd":0.1262,"bw":0.2088,"bm":-1.2899,"r2":0.2325},"69":{"lev":0.48,"fat":0.3,"blowup":0.0,"model":"GJR-GARCH(1,1,1)-t","bd":0.1502,"bw":0.2451,"bm":-1.3378,"r2":0.2402},"70":{"lev":0.56,"fat":0.2,"blowup":0.0,"model":"GJR-GARCH(1,1,1)-t","bd":0.0904,"bw":0.1748,"bm":-1.2679,"r2":0.233},"72":{"lev":0.32,"fat":0.18,"blowup":0.0,"model":"GJR-GARCH(1,1,1)-t","bd":0.1068,"bw":0.1733,"bm":-1.2659,"r2":0.2324},"75":{"lev":0.44,"fat":0.18,"blowup":0.01,"model":"GJR-GARCH(1,1,1)-t","bd":0.1302,"bw":0.2575,"bm":-1.3592,"r2":0.2392},"76":{"lev":0.44,"fat":0.2,"blowup":0.0,"model":"GJR-GARCH(1,1,1)-t","bd":0.138,"bw":0.3016,"bm":-1.4037,"r2":0.2416},"82":{"lev":0.28,"fat":0.16,"blowup":0.0,"model":"GARCH(1,1)-t","bd":0.087,"bw":0.1828,"bm":-1.2753,"r2":0.2268},"88":{"lev":0.4,"fat":0.28,"blowup":0.0101,"model":"GJR-GARCH(1,1,1)-t","bd":0.1415,"bw":0.2357,"bm":-1.3077,"r2":0.2441},"89":{"lev":0.5,"fat":0.18,"blowup":0.0,"model":"GJR-GARCH(1,1,1)-t","bd":0.0992,"bw":0.1858,"bm":-1.2625,"r2":0.2321},"90":{"lev":0.36,"fat":0.24,"blowup":0.0101,"model":"GJR-GARCH(1,1,1)-t","bd":0.125,"bw":0.2215,"bm":-1.3626,"r2":0.2351},"93":{"lev":0.38,"fat":0.18,"blowup":0.0,"model":"GJR-GARCH(1,1,1)-t","bd":0.1115,"bw":0.2301,"bm":-1.3462,"r2":0.2338},"96":{"lev":0.36,"fat":0.14,"blowup":0.0,"model":"GJR-GARCH(1,1,1)-t","bd":0.1071,"bw":0.2173,"bm":-1.2724,"r2":0.2331},"97":{"lev":0.36,"fat":0.26,"blowup":0.01,"model":"GJR-GARCH(1,1,1)-t","bd":0.1272,"bw":0.2533,"bm":-1.3598,"r2":0.2351},"98":{"lev":0.4,"fat":0.38,"blowup":0.0102,"model":"GJR-GARCH(1,1,1)-t","bd":0.1274,"bw":0.2472,"bm":-1.3877,"r2":0.2392},"99":{"lev":0.48,"fat":0.18,"blowup":0.0,"model":"GJR-GARCH(1,1,1)-t","bd":0.0898,"bw":0.1551,"bm":-1.2737,"r2":0.2288},"101":{"lev":0.32,"fat":0.2,"blowup":0.0,"model":"GJR-GARCH(1,1,1)-t","bd":0.1252,"bw":0.1975,"bm":-1.2557,"r2":0.2327},"103":{"lev":0.4,"fat":0.24,"blowup":0.0102,"model":"GJR-GARCH(1,1,1)-t","bd":0.1637,"bw":0.3026,"bm":-1.3719,"r2":0.2479},"108":{"lev":0.52,"fat":0.3,"blowup":0.0,"model":"GJR-GARCH(1,1,1)-t","bd":0.0994,"bw":0.2828,"bm":-1.3167,"r2":0.2378},"109":{"lev":0.38,"fat":0.08,"blowup":0.0,"model":"GJR-GARCH(1,1,1)-t","bd":0.123,"bw":0.2062,"bm":-1.3086,"r2":0.2358},"111":{"lev":0.38,"fat":0.2,"blowup":0.0,"model":"GJR-GARCH(1,1,1)-t","bd":0.1195,"bw":0.1834,"bm":-1.2717,"r2":0.2356},"112":{"lev":0.46,"fat":0.22,"blowup":0.0102,"model":"GJR-GARCH(1,1,1)-t","bd":0.1378,"bw":0.2412,"bm":-1.3599,"r2":0.2367},"113":{"lev":0.4,"fat":0.14,"blowup":0.0,"model":"GJR-GARCH(1,1,1)-t","bd":0.1325,"bw":0.2432,"bm":-1.3465,"r2":0.2345},"116":{"lev":0.4,"fat":0.18,"blowup":0.0101,"model":"GJR-GARCH(1,1,1)-t","bd":0.1102,"bw":0.3037,"bm":-1.4088,"r2":0.2375},"119":{"lev":0.54,"fat":0.08,"blowup":0.0,"model":"GJR-GARCH(1,1,1)-t","bd":0.1112,"bw":0.2382,"bm":-1.3398,"r2":0.233},"120":{"lev":0.46,"fat":0.24,"blowup":0.0,"model":"GJR-GARCH(1,1,1)-t","bd":0.0929,"bw":0.2047,"bm":-1.2879,"r2":0.2252},"122":{"lev":0.46,"fat":0.18,"blowup":0.0,"model":"GJR-GARCH(1,1,1)-t","bd":0.1163,"bw":0.1961,"bm":-1.301,"r2":0.2348},"123":{"lev":0.48,"fat":0.14,"blowup":0.0,"model":"GJR-GARCH(1,1,1)-t","bd":0.1154,"bw":0.208,"bm":-1.2972,"r2":0.2328},"124":{"lev":0.54,"fat":0.24,"blowup":0.0,"model":"GJR-GARCH(1,1,1)-t","bd":0.1048,"bw":0.2505,"bm":-1.3113,"r2":0.2332},"125":{"lev":0.58,"fat":0.16,"blowup":0.0,"model":"GJR-GARCH(1,1,1)-t","bd":0.0755,"bw":0.1296,"bm":-1.1748,"r2":0.2293},"126":{"lev":0.36,"fat":0.26,"blowup":0.0101,"model":"GJR-GARCH(1,1,1)-t","bd":0.1157,"bw":0.1933,"bm":-1.2623,"r2":0.2359}};
+
+// LightGBM feature importance (split count, averaged across regimes)
+const LGBM_FI = [
+  {f:'RV Mean',        raw:'rv_mean',       imp:552, tag:'rv'},
+  {f:'RV Last',        raw:'rv_last',        imp:424, tag:'rv'},
+  {f:'RV Last-3 Avg',  raw:'rv_last3_mean',  imp:405, tag:'rv'},
+  {f:'Spread Last',    raw:'spread_last',    imp:358, tag:'spread'},
+  {f:'RV Mid Avg',     raw:'rv_mid_mean',    imp:317, tag:'rv'},
+  {f:'RV Min',         raw:'rv_min',         imp:274, tag:'rv'},
+  {f:'Spread Mean',    raw:'spread_mean',    imp:231, tag:'spread'},
+  {f:'Stock RV Avg',   raw:'stock_mean_rv',  imp:216, tag:'stock'},
+  {f:'RV First-3 Avg', raw:'rv_first3_mean', imp:205, tag:'rv'},
+  {f:'RV First',       raw:'rv_first',       imp:204, tag:'rv'},
+  {f:'Spread Std',     raw:'spread_std',     imp:171, tag:'spread'},
+  {f:'Spread Trend',   raw:'spread_trend',   imp:164, tag:'spread'},
+];
+
 const REGIME_GUARDRAIL = {
   liquid:   { primary:['GARCH','EGARCH-X'], avoid:"LightGBM", reason:"LightGBM excluded. GJR-GARCH preferred over EGARCH-X for short intraday sessions. BAS coefficient is unstable at this window length. EGARCH-X competitive for longer horizons." },
   illiquid: { primary:['HAR-RV','LightGBM'], avoid:"EGARCH-X", reason:"EGARCH-X excluded: unstable on thin books (5.8% blowup rate observed)." },
@@ -1896,6 +1933,8 @@ function renderStock(id) {
   if (!s) return;
   const el = document.getElementById('stock-content');
   el.innerHTML = buildStockHTML(s);
+  // Animate the first (LightGBM) tab bars immediately
+  setTimeout(()=>animateFiBars(document.getElementById('fi_'+id+'-lgbm')), 80);
   el.classList.add('fade-in');
 }
 
@@ -2050,6 +2089,7 @@ function buildStockHTML(s) {
 
   // Narrative
   const narrative = buildNarrative(s, improve);
+  const featurePanel = buildFeaturePanel(s);
 
   return `<div class="space-y-4 fade-in">
     <!-- Stock Header -->
@@ -2072,8 +2112,117 @@ function buildStockHTML(s) {
       ${recCard}
     </div>
     ${metricsCard}
+    ${featurePanel}
     ${narrative}
   </div>`;
+}
+
+function buildFeaturePanel(s) {
+  const p = STOCK_PARAMS[String(s.id)] || null;
+  const uid = 'fi_' + s.id;
+  const maxImp = LGBM_FI[0].imp;
+  const totalImp = LGBM_FI.reduce((a,x)=>a+x.imp,0);
+
+  // LightGBM bars
+  const lgbmBars = LGBM_FI.map(f => {
+    const pct = (f.imp/totalImp*100).toFixed(1);
+    const w   = (f.imp/maxImp*100).toFixed(1);
+    const cls = f.tag==='rv' ? 'fi-tag-rv' : f.tag==='spread' ? 'fi-tag-spread' : f.tag==='stock' ? 'fi-tag-stock' : 'fi-tag-other';
+    return `<div class="fi-bar-wrap">
+      <span class="fi-label">${f.f}</span>
+      <div class="fi-track"><div class="fi-fill ${cls}" style="width:0%" data-w="${w}"></div></div>
+      <span class="fi-pct">${pct}%</span>
+    </div>`;
+  }).join('');
+
+  const lgbmLegend = `<div class="flex flex-wrap gap-2 mt-3 mb-1">
+    <span class="flex items-center gap-1 text-xs text-slate-400"><span class="inline-block w-3 h-2 rounded" style="background:#06b6d4"></span>RV feature</span>
+    <span class="flex items-center gap-1 text-xs text-slate-400"><span class="inline-block w-3 h-2 rounded" style="background:#a78bfa"></span>Spread feature</span>
+    <span class="flex items-center gap-1 text-xs text-slate-400"><span class="inline-block w-3 h-2 rounded" style="background:#38bdf8"></span>Cross-stock</span>
+  </div>`;
+
+  // GARCH param bars (per stock)
+  let garchBars = '<p class="text-xs text-slate-500 italic">No parameter data.</p>';
+  if (p) {
+    const garchItems = [
+      { label:'Leverage active', val:p.lev,    pct:(p.lev*100).toFixed(0)+'%',   color:'#10b981', max:1 },
+      { label:'Fat tails',       val:p.fat,    pct:(p.fat*100).toFixed(0)+'%',   color:'#38bdf8', max:1 },
+      { label:'Blowup rate',     val:p.blowup, pct:(p.blowup*100).toFixed(2)+'%',color: p.blowup>0 ? '#f43f5e' : '#64748b', max:0.02 },
+    ];
+    garchBars = garchItems.map(g => {
+      const w = Math.min(g.val/g.max*100,100).toFixed(1);
+      return `<div class="param-row">
+        <span class="param-label">${g.label}</span>
+        <div class="param-track"><div class="param-fill" style="width:0%;background:${g.color}" data-w="${w}"></div></div>
+        <span class="param-val" style="color:${g.color}">${g.pct}</span>
+      </div>`;
+    }).join('');
+    const modelTag = p.model.includes('GJR') ? '<span class="metric-badge bg-sky-900/30 border-sky-700 text-sky-300 ml-2">GJR-GARCH</span>' : '<span class="metric-badge bg-slate-700/50 border-slate-600 text-slate-400 ml-2">GARCH(1,1)-t</span>';
+    garchBars = `<div class="flex items-center mb-3">${modelTag}<span class="text-xs text-slate-500 ml-2">fitted spec</span></div>` + garchBars;
+  }
+
+  // HAR-RV beta bars
+  let harBars = '<p class="text-xs text-slate-500 italic">No HAR data.</p>';
+  if (p && p.bd !== undefined) {
+    const maxBeta = 0.35;
+    const harItems = [
+      { label:'Short (1×30s)',   val:p.bd, disp:p.bd.toFixed(4),  color:'#f59e0b' },
+      { label:'Medium (5×30s)',  val:p.bw, disp:p.bw.toFixed(4),  color:'#10b981' },
+      { label:'Long (16×30s)',   val:Math.abs(p.bm), disp:p.bm.toFixed(4), color:'#f43f5e', note:'negative' },
+    ];
+    harBars = `<p class="text-xs text-slate-500 mb-2">Intra-session lags only. Each lag = one 30s bucket within the same 10-min window.</p>
+    <div class="flex items-center gap-2 mb-3">
+      <span class="text-xs text-slate-500">R<sup>2</sup></span>
+      <div class="flex-1 h-1.5 bg-slate-700 rounded overflow-hidden"><div style="width:${(p.r2*100).toFixed(0)}%;background:#6366f1;height:100%;border-radius:9999px"></div></div>
+      <span class="text-xs font-bold text-indigo-400">${(p.r2*100).toFixed(1)}%</span>
+    </div>` + harItems.map(h => {
+      const w = (Math.min(h.val/maxBeta,1)*100).toFixed(1);
+      return `<div class="param-row">
+        <span class="param-label">${h.label}</span>
+        <div class="param-track"><div class="param-fill" style="width:0%;background:${h.color}" data-w="${w}"></div></div>
+        <span class="param-val" style="color:${h.color}">${h.disp}${h.note?'<span class="text-xs text-slate-600 ml-0.5">(-)</span>':''}</span>
+      </div>`;
+    }).join('');
+  }
+
+  const tabs = [
+    { id:'lgbm',  label:'LightGBM Drivers',   content: lgbmLegend + lgbmBars },
+    { id:'garch', label:'GARCH Parameters',    content: garchBars },
+    { id:'har',   label:'HAR-RV Coefficients', content: harBars },
+  ];
+
+  const tabBtns = tabs.map((t,i)=>`<button class="fi-subtab-btn ${i===0?'active':''}" onclick="switchFiTab('${uid}','${t.id}',this)">${t.label}</button>`).join('');
+  const tabPanes = tabs.map((t,i)=>`<div id="${uid}-${t.id}" class="${i===0?'block':'hidden'} pt-3">${t.content}</div>`).join('');
+
+  return `<div class="card p-4" id="${uid}-card">
+    <div class="flex items-center justify-between mb-3">
+      <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400">Model Drivers</h3>
+      <span class="text-xs text-slate-600">split count / session avg</span>
+    </div>
+    <div class="flex flex-wrap gap-1.5 mb-1">${tabBtns}</div>
+    ${tabPanes}
+  </div>`;
+}
+
+function switchFiTab(uid, tab, btn) {
+  const card = document.getElementById(uid+'-card');
+  card.querySelectorAll('.fi-subtab-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  ['lgbm','garch','har'].forEach(t=>{
+    const el = document.getElementById(uid+'-'+t);
+    if(el) el.className = t===tab ? 'block pt-3' : 'hidden pt-3';
+  });
+  // Animate bars in the newly shown pane
+  setTimeout(()=>animateFiBars(document.getElementById(uid+'-'+tab)), 30);
+}
+
+function animateFiBars(container) {
+  if (!container) return;
+  container.querySelectorAll('.fi-fill, .param-fill').forEach(el => {
+    const w = el.dataset.w || '0';
+    el.style.width = '0%';
+    requestAnimationFrame(()=>{ el.style.width = w+'%'; });
+  });
 }
 
 function buildNarrative(s, improve) {

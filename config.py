@@ -45,23 +45,9 @@ MIXED_SCORE_LO = 0.3
 MIXED_SCORE_HI = 0.7
 RANDOM_SEED    = 42   # reproducible mixed-stock selection
 
-# -- Manual stock overrides ---------------------------------------------------
-# Fill these lists to pin exactly which stocks each model runs on.
-# Leave all three empty ([]) to use automatic selection from the liquidity profile.
-#
-# How to use:
-#   1. Run rosa.py once  ->  prints "Stock selection from Rosa's profile"
-#                            with the exact stock_ids chosen.
-#   2. Copy those ids into the lists below and share config.py with groupmates.
-#
-# Example (replace with your actual ids after first run):
-#   LIQUID_STOCKS   = [43, 29, 69, 111, 41, 124, 46, 47, 125, 14, ...]
-#   ILLIQUID_STOCKS = [31, 18, 37, 75, 27, 33, 97, 112, 40, 9, ...]
-#   MIXED_STOCKS    = [5, 12, 23, ...]
-#
-LIQUID_STOCKS   = [2, 14, 29, 39, 41, 43, 44, 46, 47, 50, 64, 69, 93, 99, 111, 119, 120, 123, 124, 125]   # <- fill in to override auto-selection
-ILLIQUID_STOCKS = [3, 5, 6, 9, 18, 27, 31, 33, 37, 40, 62, 75, 88, 90, 97, 98, 103, 112, 116, 126]   # <- fill in to override auto-selection
-MIXED_STOCKS    = [7, 15, 17, 19, 26, 32, 48, 56, 59, 70, 72, 76, 82, 89, 96, 101, 108, 109, 113, 122]   # <- fill in to override auto-selection
+LIQUID_STOCKS   = [2, 14, 29, 39, 41, 43, 44, 46, 47, 50, 64, 69, 93, 99, 111, 119, 120, 123, 124, 125]   
+ILLIQUID_STOCKS = [3, 5, 6, 9, 18, 27, 31, 33, 37, 40, 62, 75, 88, 90, 97, 98, 103, 112, 116, 126]  
+MIXED_STOCKS    = [7, 15, 17, 19, 26, 32, 48, 56, 59, 70, 72, 76, 82, 89, 96, 101, 108, 109, 113, 122] 
 
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
